@@ -38,7 +38,7 @@ Then you just have to get the value in the attribute `client_secret`. You will n
 
 Download the repository. You can work inside it. Beware that the examples assume that they can access the file `./libtado/api.py`.
 
-Now you can call it in your Pyhton script !
+Now you can call it in your Pyhton script!
 
 ```python
 import libtado.api
@@ -54,5 +54,5 @@ print(t.get_state(1))
 ## Examples
 
 An example script is provided in the repository as `example.py`.
-It show you haw to use the library and expose some structured responses.
+It shows you how to use the library and expose some structured responses. A more detailed example is available in `libtado/__main__.py`.
 
