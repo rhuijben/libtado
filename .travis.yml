@@ -5,4 +5,4 @@ install:
   - pip install requests click
 git:
   quiet: true
-script: python check.py $pypi_username $pypi_password
+script: python check.py $tado_username $tado_password $tado_client_secret
