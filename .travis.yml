@@ -6,3 +6,10 @@ install:
 git:
   quiet: true
 script: python check.py $tado_username $tado_password $tado_client_secret
+deploy:
+  provider: pypi
+  user: $pypi_username
+  password: "toto"
+#    secure: ""
+# on:
+#   tags: true
