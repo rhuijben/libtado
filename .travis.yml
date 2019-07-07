@@ -9,7 +9,7 @@ script: python check.py $tado_username $tado_password $tado_client_secret
 deploy:
   provider: pypi
   user: $pypi_username
-  password: "toto"
-#    secure: ""
-# on:
-#   tags: true
+  password: $pypi_password
+  on:
+    branch: feat/build
+    tags: true
