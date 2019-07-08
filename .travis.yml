@@ -11,5 +11,5 @@ deploy:
   user: $pypi_username
   password: $pypi_password
   on:
-    branch: feat/build
+    branch: master
     tags: true
