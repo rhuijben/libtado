@@ -90,3 +90,4 @@ ENV/
 
 # Custom
 test.py
+gitchangelog.py
