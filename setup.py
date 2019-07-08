@@ -2,11 +2,11 @@ from setuptools import setup, find_packages
 
 setup(
   name='libtado',
-  version='2.0.0.dev1',
-  author='Max Rosin',
-  author_email='libtado@hackrid.de',
+  version='3.0.1.dev1',
+  author='Germain Lefebvre',
+  author_email='germainlefebvre4@gmail.com',
   description='A library (and a command line client) to control your Tado Smart Thermostat.',
-  url='https://github.com/ekeih/libtado',
+  url='https://github.com/germainlefebvre4/libtado',
   license='GPLv3+',
   packages=find_packages(),
   classifiers=[
