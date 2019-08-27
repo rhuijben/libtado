@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
   name='libtado',
-  version='3.0.3',
+  version='3.0.2',
   author='Germain Lefebvre',
   author_email='germainlefebvre4@gmail.com',
   description='A library (and a command line client) to control your Tado Smart Thermostat.',
