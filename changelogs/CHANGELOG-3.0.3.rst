@@ -1,5 +1,5 @@
-3.0.2
------
+3.0.1.deploy
+------------
 
 Features
 ~~~~~~~~
@@ -7,6 +7,7 @@ Features
 
 Other
 ~~~~~
+- Chore(changelog): Changelog for version 3.0.2. [Germain LEFEBVRE]
 - Chore(git): Add Pipfile to gitignore. [Germain LEFEBVRE]
 - Chore(doc): Updated way of getting CLIENT_SECRET. [Terence Eden]
 
