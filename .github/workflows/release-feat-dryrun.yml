@@ -31,7 +31,7 @@ jobs:
         with:
           branches: |
             [
-              'chore/release-pypi'
+              'chore/pytest'
             ]
           semantic_version: 17.2.2
           extra_plugins: |
@@ -50,6 +50,14 @@ jobs:
           mode: set
           key: version
           value: ${{ steps.semantic.outputs.new_release_version }}
+      - name: set release_published
+        id: set_release_published
+        uses: noobly314/share-data@v1
+        with:
+          share-id: release_published
+          mode: set
+          key: is_published
+          value: ${{ steps.semantic.outputs.new_release_published }}
 
 
   deploy:
@@ -61,6 +69,7 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: '3.7'
+          
       - name: get release_version
         id: release_version
         uses: noobly314/share-data@v1
@@ -68,17 +77,25 @@ jobs:
           share-id: release_version
           mode: get
           key: version
-      - name: echo
+      - name: get release_published
+        id: release_published
+        uses: noobly314/share-data@v1
+        with:
+          share-id: release_published
+          mode: get
+          key: is_published
+
+      - name: Update package version
         run: |
           echo ${{ steps.release_version.outputs.data }}
           sed "s/^\( *version=\).*/\1'${{ steps.release_version.outputs.data }}',/g" setup.py
-      - name: Update package version
-        run: |
           sed -i "s/^\( *version=\).*/\1'${{ steps.release_version.outputs.data }}',/g" setup.py
+        if: steps.release_published.outputs.data == 'true'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
+        if: steps.release_published.outputs.data == 'true'
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
@@ -86,3 +103,4 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
           twine upload --repository testpypi dist/*
+        if: steps.release_published.outputs.data == 'true'
