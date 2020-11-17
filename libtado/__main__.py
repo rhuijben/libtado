@@ -191,7 +191,7 @@ def status(tado):
     cur_hum =  st['sensorDataPoints']['humidity']['percentage']
 
     if st['link']['state'] != 'ONLINE':
-      setting = '-off-'
+      setting = '-x-' # Disconnected in tado-style
     elif st['setting']['power'] != 'ON':
       setting = st['setting']['power']
     else:
