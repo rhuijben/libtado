@@ -30,7 +30,7 @@ print_d(tado.get_installations())
 print('--users')
 print_d(tado.get_users())
 
-print('--heating_ciruits')
+print('--heating_circuits')
 print_d(tado.get_heating_circuits())
 
 print('--incidents')
@@ -80,6 +80,9 @@ print_d(tado.get_schedule_blocks(zone_id, schedule_id))
 print('--devices')
 devices = tado.get_devices()
 print_d(devices)
+
+print('--device %s' % devices[-1]['shortSerialNo'])
+print_d(tado.get_device(devices[-1]['shortSerialNo'] ))
 
 print('--device_usage')
 print_d(tado.get_device_usage())

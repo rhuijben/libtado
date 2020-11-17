@@ -252,6 +252,20 @@ class Tado:
     """
     data = self._api_call('homes/%i/devices' % self.id)
     return data
+    
+  def get_device(self, device_serial):
+    """
+    Gets the status of a specific device
+    
+    Args:
+      device_status (str): serial of device
+    
+    returns:
+      dict with data of the device
+    """
+    
+    data = self._api_call('devices/%s' % device_serial)
+    return data
 
   def get_device_usage(self):
     """

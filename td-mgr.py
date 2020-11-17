@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil import tz
 
-zone_map = { 'D': 3, 'P' : 4, 'R' : 1, 'B': 2, 'T' : 7, 'J' : 6}
+zone_map = { 'D': 3, 'P' : 4, 'S' : 1, 'B': 2, 'T' : 7, 'J' : 6}
 reverse_zone_map = {}
 zone_info = {}
 t = None
