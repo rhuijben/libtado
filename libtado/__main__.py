@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
 
 import click
+import datetime
+from dateutil.parser import parse
+from dateutil import tz
 import libtado.api
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -19,6 +22,7 @@ def main(ctx, username, password, client_secret):
 
   Call 'tado COMMAND --help' to see available options for subcommands.
   """
+
   ctx.obj = libtado.api.Tado(username, password, client_secret)
 
 
@@ -51,6 +55,28 @@ def devices(tado):
       click.echo('Firmware: %s' % d['currentFwVersion'])
       click.echo('Connection: %s (%s)' % (d['connectionState']['value'], d['connectionState']['timestamp']))
       click.echo('Mounted: %s (%s)' % (d['mountingState']['value'], d['mountingState']['timestamp']))
+    elif d['deviceType'] == 'IB01':
+      # V2 internet bridge
+      click.echo('Serial: %s' % d['serialNo'])
+      click.echo('Type: %s' % d['deviceType'])
+      click.echo('Firmware: %s' % d['currentFwVersion'])
+      click.echo('Connection: %s (%s)' % (d['connectionState']['value'], d['connectionState']['timestamp']))
+      click.echo('Pairing: %s' % d['inPairingMode'])
+    elif d['deviceType'] == 'VA02':
+      # V2 smart radiator thermostat
+      click.echo('Serial: %s' % d['serialNo'])
+      click.echo('Type: %s' % d['deviceType'])
+      click.echo('Firmware: %s' % d['currentFwVersion'])
+      click.echo('Connection: %s (%s)' % (d['connectionState']['value'], d['connectionState']['timestamp']))
+      click.echo('Mounted: %s (%s)' % (d['mountingState']['value'], d['mountingState']['timestamp']))
+      click.echo('Battery State: %s' % d['batteryState'])
+    elif d['deviceType'] == 'RU02':
+      # V2 smart wall theromstat
+      click.echo('Serial: %s' % d['serialNo'])
+      click.echo('Type: %s' % d['deviceType'])
+      click.echo('Firmware: %s' % d['currentFwVersion'])
+      click.echo('Connection: %s (%s)' % (d['connectionState']['value'], d['connectionState']['timestamp']))
+      click.echo('Battery State: %s' % d['batteryState'])
     else:
       click.secho('Device type %s not supported. Please report a bug with the following output.' % d['deviceType'], fg='black', bg='red')
       d['serialNo'] = 'XXX'
@@ -78,7 +104,11 @@ def early_start(tado, zone, set):
 @click.pass_obj
 def home(tado):
   """Display information about your home."""
-  click.echo(tado.get_home())
+  home= tado.get_home()
+  click.echo('Home: %s (%i)' % (home['name'], home['id']))
+  click.echo('Created: %s' % parse(home['dateCreated']).astimezone(tz.tzlocal()).strftime('%c'))
+  click.echo('Installation Complete: %s' % home['installationCompleted'])
+  click.echo(home)
 
 
 @main.command()
@@ -92,7 +122,10 @@ def mobile(tado):
 @click.pass_obj
 def users(tado):
   """Display all users of your home."""
-  click.echo(tado.get_users())
+  users = tado.get_users()
+  for u in users:
+    click.echo('User: %s <%s>' % (u['name'], u['email']))
+  click.echo(users)
 
 
 @main.command(short_help='Tell me who the Tado API thinks I am.')
@@ -117,7 +150,7 @@ def whoami(tado):
 @click.pass_obj
 def zone(tado, zone):
   """
-  Get the current state of a zone. Including temperature, humidity and 
+  Get the current state of a zone. Including temperature, humidity and
   heating power.
   """
   zone = tado.get_state(zone)
@@ -128,6 +161,77 @@ def zone(tado, zone):
   click.echo('Mode : %s' % zone['tadoMode'])
   click.echo('Link : %s' % zone['link']['state'])
 
+@main.command(short_help='Show current status.')
+@click.pass_obj
+def status(tado):
+  """
+  Show the current home status in a list form
+  """
+
+  def time_str(time_str):
+    given_time = parse(time_str).astimezone(tz.tzlocal())
+    now = datetime.datetime.now().replace(tzinfo=tz.tzlocal())
+
+    if (given_time - now).days < 1:
+      return given_time.strftime('%H:%M') # As Time
+    elif (given_time - now).days < 7:
+      return given_time.strftime('%A') # Monday,..
+    else:
+      return given_time.strftime('%Y-%-m-%-d') # Date
+
+
+  zone_info = tado.get_zones()
+
+  for i in zone_info:
+    st = tado.get_state(i['id'])
+
+    zone = i['id']
+
+    cur_temp = st['sensorDataPoints']['insideTemperature']['celsius']
+    cur_hum =  st['sensorDataPoints']['humidity']['percentage']
+
+    if st['link']['state'] != 'ONLINE':
+      setting = '-off-'
+    elif st['setting']['power'] != 'ON':
+      setting = st['setting']['power']
+    else:
+      setting = '%4.1fC' % (st['setting']['temperature']['celsius'])
+
+    type_s = ''
+    if st['overlayType'] and st['tadoMode'] != 'AWAY':
+      type_s = st['overlayType']
+    elif st['tadoMode'] != 'HOME':
+      type_s = st['tadoMode'];
+
+    next_s = ''
+
+    if st['tadoMode'] != 'AWAY':
+      if st['overlay'] != None:
+        if 'termination' in st['overlay'] and st['overlay']['termination']['type'] == 'MANUAL':
+          next_s = '-+-'
+        elif st['overlay']['termination']['projectedExpiry'] != None:
+          next_s = '-' + ('%s' % time_str(st['overlay']['termination']['projectedExpiry']))
+        else:
+          next_s = '-+-'
+      elif st['nextScheduleChange'] != None:
+        next_s = '-' + ('%s' % time_str(st['nextScheduleChange']['start']))
+
+    extra = ''
+
+    if st['openWindow'] != None:
+      extra += ' Window open'
+    for d in i['devices']:
+      if d['batteryState'] != 'NORMAL':
+        extra += ' Battery %s' % d['batteryState']
+
+    heat_s = int(st['activityDataPoints']['heatingPower']['percentage'])
+
+    if heat_s == 0:
+      heat_s = ''
+    else:
+      heat_s = '%i%%' % heat_s
+
+    click.echo('%-14s %2d %3s %5s %-8s %6s  %3.2fC %3.1f%%%s' % (i['name'], zone, heat_s, setting, next_s, type_s, cur_temp, cur_hum, extra))
 
 @main.command(short_help='Get configuration information about all zones.')
 @click.pass_obj
