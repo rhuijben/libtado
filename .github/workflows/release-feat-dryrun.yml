@@ -3,9 +3,9 @@ name: Release development branches
 on:
   push:
     branches:
+    - develop
     - feat/*
     - fix/*
-    - chore/*
 
 jobs:
   release:
@@ -31,7 +31,9 @@ jobs:
         with:
           branches: |
             [
-              'chore/pytest'
+              'develop',
+              'feat/*',
+              'fix/*'
             ]
           semantic_version: 17.2.2
           extra_plugins: |
@@ -39,6 +41,7 @@ jobs:
             @semantic-release/release-notes-generator@9.0.0
             @semantic-release/changelog@5.0.0
             @semantic-release/github@7.0.7
+          dry_run: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
