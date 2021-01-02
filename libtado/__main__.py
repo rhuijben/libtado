@@ -15,6 +15,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def main(ctx, username, password, client_secret):
   """
+  Example
+  =======
   This script provides a command line client for the Tado API.
 
   You can use the environment variables TADO_USERNAME, TADO_PASSWORD and
