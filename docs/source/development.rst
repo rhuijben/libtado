@@ -13,11 +13,12 @@ You can download the library sources at https://github.com/germainlefebvre4/libt
 Requirements
 ************
 
-The library development requires at least python `3.7`.
+The library development requires at least python ``3.7``.
 
 This library is tested with following python versions:
-* `3.7`
-* `3.8`
+
+* ``3.7``
+* ``3.8``
 
 *****
 Setup
