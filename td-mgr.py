@@ -53,11 +53,20 @@ def show_help():
   print()
 
 
-def show_list(verbose):
+def show_list(verbose, zones):
   global zone_info
 
   if not zone_info:
     zone_info = t.get_zones()
+    
+  if zones:
+    zi = zone_info
+    zone_info = []
+    
+    for z in zones:
+      for i in zi:
+        if z == i['id']:
+          zone_info.append(i)
 
   for i in zone_info:
     st = t.get_state(i['id'])
@@ -181,7 +190,7 @@ def main(argv):
       set_temp = -1
 
 
-  if set_temp != None and not zones:
+  if (do_list or set_temp != None) and not zones:
     if not zone_info:
       zone_info = t.get_zones()
 
@@ -192,7 +201,7 @@ def main(argv):
     set_temperature(zones, set_temp, set_termination)
 
   if do_list:
-    show_list(verbose)
+    show_list(verbose, zones)
 
 
 if __name__ == "__main__":
